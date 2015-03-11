@@ -42,21 +42,3 @@ def tenMinutesCheck():
   tenMinutesRun=tenMinutes
   
 
-#>>> if 3 in range(7,12)+range(0,4): print 3;
-#... 
-#3
-#>>> if 5 in range(7,12)+range(0,4): print 3;
-#...
-
-import sched, time
-s = sched.scheduler(time.time, time.sleep)
-def print_time(): print "From print_time", time.time()
-
-def print_some_times():
-    print time.time()
-    s.enter(5, 1, print_time, ())
-    s.enter(10, 1, print_time, ())
-    s.run()
-    print time.time()
-
-print_some_times()

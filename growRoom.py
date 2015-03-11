@@ -4,8 +4,8 @@ from stgs import stgs
 
 RelayON  = False  # relay are driven inverted
 RelayOFF = True
-LedON  = True
-LedOFF = False
+LedON  = False
+LedOFF = True
 # Wiring
 Rlight  = 27 # relay 1 - light
 Rpomp   = 22 # relay 2 - pomp
@@ -37,11 +37,15 @@ GPIO.setup(LED3, LedOFF)
 
 t=None; h=None;
 while not(t): t=ths.get_temperature(THS);
+
 while not(h): h=ths.get_humidity(THS);
+
 if t: # handle empty variable
   temperature=t
+
 if h:
   humidity=h
+
 #print 'temp',temperature, 'hum', humidity
 print 'Temp={0:0.1f}*C Humidity={1:0.1f}%' .format(temperature, humidity)
 
