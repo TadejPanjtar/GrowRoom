@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import am2302_ths as ths
+from time import strftime,sleep
 from stgs import stgs
 
 RelayON  = False  # relay are driven inverted
@@ -18,6 +19,7 @@ LED3    =  5 # if humidity too low
 LED4    =  6 # if moisture too low
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 GPIO.setup(Rlight, GPIO.OUT)
 GPIO.setup(Rheat,  GPIO.OUT)
 GPIO.setup(Rpomp,  GPIO.OUT)
@@ -34,6 +36,16 @@ GPIO.setup(Rheat, RelayOFF)
 GPIO.setup(Rpomp, RelayOFF)
 GPIO.setup(Rpomp2, RelayOFF)
 GPIO.setup(LED3, LedOFF)
+
+GPIO.setup(LED1, LedON)
+GPIO.setup(LED2, LedON)
+GPIO.setup(LED3, LedON)
+GPIO.setup(LED4, LedON)
+sleep(2)
+GPIO.setup(LED1, LedOFF)
+GPIO.setup(LED2, LedOFF)
+GPIO.setup(LED3, LedOFF)
+GPIO.setup(LED4, LedOFF)
 
 t=None; h=None;
 while not(t): t=ths.get_temperature(THS);
