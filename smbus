@@ -6,7 +6,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(17,  GPIO.OUT)
 GPIO.setup(17, False)
-sleep(0.1)
+# sleep(0.1)
 GPIO.setup(17, True)
 
 

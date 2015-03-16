@@ -70,22 +70,22 @@ def handle_light():
     if lightOn:
       GPIO.setup(Rlight, RelayON)
       GPIO.setup(LED1, LedON)
-    else
+    else:
       GPIO.setup(Rlight, RelayOFF)
       GPIO.setup(LED1, LedOFF)
   lightOldOn=lightOn
 
 print 'lightHours', lightHours
 
-def handle_heating()
+def handle_heating():
   if temperature<stgs.temperature:
     GPIO.setup(Rheat, RelayON)
     log("Heating ON")
   else:
     GPIO.setup(Rheat, RelayOFF)
-     log("Heating OFF")
+    log("Heating OFF")
    
-def handle_pomp()
+def handle_pomp():
   if humidity<stgs.humidity:
     GPIO.setup(Rpomp, RelayON)
     sleep(10)
@@ -126,9 +126,8 @@ while True:
       GPIO.setup(LED3, LedON)
     if moisture<stgs.moisture:
       GPIO.setup(LED4, LedON)
-    log('Temp={0:0.1f}*C Humidity={1:0.1f}% Moisture={1:0.1f}%' .format(temperature, humidity, moisture))
+    log('Temp={0:0.1f}*C Humidity={1:0.1f}% Moisture={2:4d}%' .format(temperature, humidity, moisture))
   else:
-    GPIO.setup(LED1, LedOFF)
     GPIO.setup(LED2, LedOFF)
     GPIO.setup(LED3, LedOFF)
     GPIO.setup(LED4, LedOFF)

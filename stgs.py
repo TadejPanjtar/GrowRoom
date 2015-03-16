@@ -1,7 +1,7 @@
 class Class(): pass # prazen razred, da gnezdimo spremenljivke po hiearhiji
 stgs=Class()
 
-stgs.temperature = 25
+stgs.temperature = 22
 stgs.humidity = 55
 stgs.moisture = 55
 stgs.pomp1duration= 10
