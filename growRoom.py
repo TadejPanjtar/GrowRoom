@@ -7,6 +7,7 @@ from stgs import stgs
 
 lightHours=[]
 lightOldOn=False # read light status
+NumSensors = 3
 LIGHT_HOURS_LEAP=24
 LIGTH_HOURS_START=stgs.lightStart
 LIGTH_HOURS_DURATION=stgs.lightDuration
@@ -16,6 +17,7 @@ temperature=0
 humidity=0
 moisture=0
 LOGGING=True
+heating=False
 
 def log(msg):
   if LOGGING:  print strftime("%Y-%m-%d %X"), msg
@@ -78,48 +80,58 @@ def handle_light():
 print 'lightHours', lightHours
 
 def handle_heating():
-  if temperature<stgs.temperature:
-    GPIO.setup(Rheat, RelayON)
-    log("Heating ON")
-  else:
-    GPIO.setup(Rheat, RelayOFF)
-    log("Heating OFF")
-   
+  global heating
+  h=temperature<stgs.temperature
+  if heating!=h:
+    if h:
+      GPIO.setup(Rheat, RelayON)
+      log("Heating ON")
+    else:
+      GPIO.setup(Rheat, RelayOFF)
+      log("Heating OFF")
+  heating=h
+
 def handle_pomp():
   if humidity<stgs.humidity:
     GPIO.setup(Rpomp, RelayON)
+    log("Spraying")
     sleep(10)
     GPIO.setup(Rpomp, RelayOFF)
-    log("Spraying")
+
+def handle_pomp2():
+  if moisture<stgs.moisture:
+    GPIO.setup(Rpomp2, RelayON)
+    log("Watering")
+    sleep(5)
+    GPIO.setup(Rpomp2, RelayOFF)
 
 def tenMinutesCheck():
   global tenMinutesRun, blinkTick
   tenMinutes=(strftime("%S")[1]=='0') # every 10 minutes
   if tenMinutesRun!=tenMinutes:
-    print "10 minutes"
     if tenMinutes: 
       handle_light()
       handle_heating()
       handle_pomp()
-    #  handle_pomp2()
+      handle_pomp2()
     blinkTick=0
   tenMinutesRun=tenMinutes
 
 t=None; h=None; moisture=33;
 
-while True:
-  if blinkTick % 3 == 0:
+while True: # Main loop end
+  if blinkTick % NumSensors == 0:
     t=ths.get_temperature(THS);
     if t: # handle empty variable
       temperature=t;
-  if blinkTick % 3 == 1:
+  if blinkTick % NumSensors == 1:
     h=ths.get_humidity(THS); 
     if h:
       humidity=h;
-  if blinkTick % 3 == 2:
+  if blinkTick % NumSensors == 2:
     # print "sensor 3" # TODO implement
     sleep(1)
-  if blinkTick % 2== 0:
+  if blinkTick % 2== 0: #every second tick conditionally turns leds on to blink
     if temperature<stgs.temperature:
       GPIO.setup(LED2, LedON)
     if humidity<stgs.humidity:
@@ -127,13 +139,13 @@ while True:
     if moisture<stgs.moisture:
       GPIO.setup(LED4, LedON)
     log('Temp={0:0.1f}*C Humidity={1:0.1f}% Moisture={2:4d}%' .format(temperature, humidity, moisture))
-  else:
+  else: #turn leds off
     GPIO.setup(LED2, LedOFF)
     GPIO.setup(LED3, LedOFF)
     GPIO.setup(LED4, LedOFF)
   blinkTick=blinkTick+1
   tenMinutesCheck()
-   
+  # Main loop end
 
 from chirp import Chirp
 # chirp = Chirp(1, 0x6f)
