@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import RPi.GPIO as GPIO
 import am2302_ths as ths
 
@@ -36,9 +37,12 @@ LED1    = 26 # indicating relay1
 LED2    = 13 # if temperature too low
 LED3    =  5 # if humidity too low
 LED4    =  6 # if moisture too low
+MOIST   = 17 # moisture digital input
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
+GPIO.setup(MOIST,  GPIO.IN)
+
 GPIO.setup(Rlight, GPIO.OUT)
 GPIO.setup(Rheat,  GPIO.OUT)
 GPIO.setup(Rpomp,  GPIO.OUT)
@@ -95,19 +99,19 @@ def handle_pomp():
   if humidity<stgs.humidity:
     GPIO.setup(Rpomp, RelayON)
     log("Spraying")
-    sleep(10)
+    sleep(stgs.pomp1duration)
     GPIO.setup(Rpomp, RelayOFF)
 
 def handle_pomp2():
-  if moisture<stgs.moisture:
+  if not(moisture):
     GPIO.setup(Rpomp2, RelayON)
     log("Watering")
-    sleep(5)
+    sleep(stgs.pomp2duration)
     GPIO.setup(Rpomp2, RelayOFF)
 
 def tenMinutesCheck():
   global tenMinutesRun, blinkTick
-  tenMinutes=(strftime("%S")[1]=='0') # every 10 minutes
+  tenMinutes=(strftime("%M")[1]=='0') # every 10 minutes
   if tenMinutesRun!=tenMinutes:
     if tenMinutes: 
       handle_light()
@@ -117,7 +121,7 @@ def tenMinutesCheck():
     blinkTick=0
   tenMinutesRun=tenMinutes
 
-t=None; h=None; moisture=33;
+t=None; h=None; moisture=False;
 
 while True: # Main loop end
   if blinkTick % NumSensors == 0:
@@ -129,16 +133,16 @@ while True: # Main loop end
     if h:
       humidity=h;
   if blinkTick % NumSensors == 2:
-    # print "sensor 3" # TODO implement
+    moisture = (GPIO.input(MOIST) == GPIO.LOW)
     sleep(1)
   if blinkTick % 2== 0: #every second tick conditionally turns leds on to blink
     if temperature<stgs.temperature:
       GPIO.setup(LED2, LedON)
     if humidity<stgs.humidity:
       GPIO.setup(LED3, LedON)
-    if moisture<stgs.moisture:
+    if not(moisture):
       GPIO.setup(LED4, LedON)
-    log('Temp={0:0.1f}*C Humidity={1:0.1f}% Moisture={2:4d}%' .format(temperature, humidity, moisture))
+    log('Temp={0:0.1f}*C Humidity={1:0.1f}% Moisture={2}' .format(temperature, humidity, moisture))
   else: #turn leds off
     GPIO.setup(LED2, LedOFF)
     GPIO.setup(LED3, LedOFF)
