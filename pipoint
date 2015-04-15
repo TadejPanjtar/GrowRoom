@@ -1,0 +1,16 @@
+#!/bin/sh
+# Configure Wifi Access Point.
+#
+### BEGIN INIT INFO
+# Provides: WifiAP
+# Required-Start: $remote_fs $syslog $time
+# Required-Stop: $remote_fs $syslog $time
+# Should-Start: $network $named slapd autofs ypbind nscd nslcd
+# Should-Stop: $network $named slapd autofs ypbind nscd nslcd
+# Default-Start: 2
+# Default-Stop:
+# Short-Description: Wifi Access Point configuration
+# Description:starts hostap
+### END INIT INFO
+# start the access point
+hostapd -B /etc/hostapd/hostapd.conf
