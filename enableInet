@@ -1,0 +1,7 @@
+#!/bin/sh
+killall hostapd 
+cp /etc/network/interfaces.old /etc/network/interfaces
+echo Remove WiPi and plug it again within 1m to start blue led
+sleep 1m
+cp /etc/network/interfaces.piui /etc/network/interfaces
+# service pipoint start
