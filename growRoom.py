@@ -6,12 +6,9 @@ from time import strftime,sleep
 from stgs import stgs
 
 
-lightHours=[]
-lightOldOn=False # read light status
 NumSensors = 3
+lightOldOn=False # read light status
 LIGHT_HOURS_LEAP=24
-LIGTH_HOURS_START=stgs.lightStart
-LIGTH_HOURS_DURATION=stgs.lightDuration
 tenMinutesRun=False
 blinkTick=0
 temperature=0
@@ -21,7 +18,8 @@ LOGGING=True
 heating=False
 
 def log(msg):
-  if LOGGING:  print strftime("%Y-%m-%d %X"), msg
+# if LOGGING:  print strftime("%Y-%m-%d %X"), msg
+  if LOGGING:  print strftime("%d-%X"), msg
 
 RelayON  = False  # relay are driven inverted
 RelayOFF = True
@@ -60,14 +58,13 @@ GPIO.setup(Rpomp, RelayOFF)
 GPIO.setup(Rpomp2, RelayOFF)
 GPIO.setup(LED3, LedOFF)
 
-if (LIGTH_HOURS_START+LIGTH_HOURS_DURATION > LIGHT_HOURS_LEAP):
-  lightHours = range(LIGTH_HOURS_START,LIGHT_HOURS_LEAP) + range(0, LIGTH_HOURS_START+LIGTH_HOURS_DURATION-LIGHT_HOURS_LEAP)
-else:
-  lightHours = range(LIGTH_HOURS_START, LIGTH_HOURS_START+LIGTH_HOURS_DURATION)
-
 def handle_light():
   global lightOldOn
-  currentHour=int(strftime("%S")) #int(strftime("%H"))
+  if (stgs.lightStart+stgs.lightDuration > LIGHT_HOURS_LEAP):
+    lightHours = range(stgs.lightStart,LIGHT_HOURS_LEAP) + range(0, stgs.lightStart+stgs.lightDuration-LIGHT_HOURS_LEAP)
+  else:
+    lightHours = range(stgs.lightStart, stgs.lightStart+stgs.lightDuration)
+  currentHour=int(strftime("%H")) # int(strftime("%S")) # for testing, %H for production
   lightOn=True if currentHour in lightHours else False
   if lightOldOn!=lightOn:
     s=' OFF '
@@ -80,8 +77,6 @@ def handle_light():
       GPIO.setup(Rlight, RelayOFF)
       GPIO.setup(LED1, LedOFF)
   lightOldOn=lightOn
-
-print 'lightHours', lightHours
 
 def handle_heating():
   global heating
@@ -142,7 +137,7 @@ while True: # Main loop end
       GPIO.setup(LED3, LedON)
     if not(moisture):
       GPIO.setup(LED4, LedON)
-    log('Temp={0:0.1f}*C Humidity={1:0.1f}% Moisture={2}' .format(temperature, humidity, moisture))
+    log('Temp={0:0.1f}*C Hum={1:0.1f}% Moist={2}' .format(temperature, humidity, moisture))
   else: #turn leds off
     GPIO.setup(LED2, LedOFF)
     GPIO.setup(LED3, LedOFF)
@@ -151,6 +146,7 @@ while True: # Main loop end
   tenMinutesCheck()
   # Main loop end
 
-from chirp import Chirp
+# from chirp import Chirp
 # chirp = Chirp(1, 0x6f)
 # chirp.cap_sense()
+# ex: et sw=2 ts=2

@@ -1,13 +1,18 @@
 import functools
 import os
 import random
-import time
+from time import strftime,sleep
 from piui import PiUi
 
 from stgs import stgs
 
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
+def mainProcWrite(s):
+  logs_file = open(os.path.join(current_dir,"pipe"), "a")
+  logs_file.write(s)
+  logs_file.close()
 
 class DemoPiUi(object):
 
@@ -16,7 +21,6 @@ class DemoPiUi(object):
         self.txt = None
         self.img = None
         self.ui = PiUi(img_dir=os.path.join(current_dir, 'imgs'))
-        self.src = "sunset.png"
 
     def page_static(self):
         self.page = self.ui.new_ui_page(title="Static Content", prev_text="Back",
@@ -27,23 +31,29 @@ class DemoPiUi(object):
             "in your UI and <b>regular</b> <i>HTML</i> <u>formatting</u>.", "p")
         self.page.add_element("hr")
         self.page.add_textbox("Your python code can update page contents at any time.", "p")
-        update = self.page.add_textbox("Like this...", "h2")
-        self.page.add_textbox("123412341234 123412341234 123412341234 You can use any\n time"
+        # update = self.page.add_textbox("Like this...", "h2")
+        logBox = self.page.add_textbox("2015-04-17 10:39:51 Temp=12.5*C Hum=55.7% Moist=False\n time"
             + "<br /> newline", "pre")
         time.sleep(2)
-        for a in range(1, 5):
-            update.set_text(str(a))
-            time.sleep(1)
+        # for a in range(1, 5):
+            # update.set_text(str(a))
+            # time.sleep(1)
+        lines = []
+        with open(os.path.join(current_dir,'logs'), 'r') as content_file:
+        # with open(os.path.join(current_dir,'stgs2.py'), 'r') as content_file:
+              lines.append(content_file.read())
+        message = '\n'.join(lines)
+        logBox.set_text(message)
 
     def page_buttons(self):
-        self.page = self.ui.new_ui_page(title="Buttons", prev_text="Back", onprevclick=self.main_menu)
-        self.title = self.page.add_textbox("Buttons!", "h1")
-        plus = self.page.add_button("Up Button &uarr;", self.onupclick)
-        minus = self.page.add_button("Down Button &darr;", self.ondownclick)
+        self.page = self.ui.new_ui_page(title="Commit changes", prev_text="Back", onprevclick=self.main_menu)
+        self.title = self.page.add_textbox("", "h1")
+        # plus = self.page.add_button("Up Button &uarr;", self.onupclick)
+        minus = self.page.add_button("Commit &darr;", self.ondownclick)
 
     def page_input(self):
         self.page = self.ui.new_ui_page(title="Lights setup", prev_text="Back", onprevclick=self.main_menu)
-#        self.title = self.page.add_textbox("Input", "h1")
+        self.title = self.page.add_textbox("pPi time: "+strftime("%d-%X"), "h1")
         self.labelStart = self.page.add_textbox("Start [hour]: "+str(stgs.lightStart), "h2")
         self.txtStart = self.page.add_input("number", "new Start hour [0..23]")
         self.labelDuration = self.page.add_textbox("Duration [hour]: "+str(stgs.lightDuration), "h2")
@@ -85,7 +95,7 @@ class DemoPiUi(object):
         self.list.add_item("Lights", chevron=True, onclick=self.page_input)
         self.list.add_item("Treshold", chevron=True, onclick=self.page_treshold)
         self.list.add_item("Pumps", chevron=True, onclick=self.page_input)
-        self.list.add_item("Commit", chevron=True, onclick=self.page_buttons)
+        self.list.add_item("Commit", chevron=False, onclick=self.page_buttons)
 #        self.list.add_item("Images", chevron=True, onclick=self.page_images)
 #        self.list.add_item("Toggles", chevron=True, onclick=self.page_toggles)
 #        self.list.add_item("Console!", chevron=True, onclick=self.page_console)
@@ -101,8 +111,26 @@ class DemoPiUi(object):
         print "Up"
 
     def ondownclick(self):
-        self.title.set_text("Down")
-        print "Down"
+        stgs_file = open("stgs2.py", "w")
+        stgs_file.write("class Class(): pass\n"
+          + "stgs=Class()\n\n")
+        stgs_file.write("stgs.temperature = %s\n" % stgs.temperature)
+        mainProcWrite  ("stgs.temperature = %s\n" % stgs.temperature)
+        stgs_file.write("stgs.humidity = %s\n" % stgs.humidity)
+        mainProcWrite  ("stgs.humidity = %s\n" % stgs.humidity)
+        stgs_file.write("stgs.pomp1duration = %s\n" % stgs.pomp1duration)
+        mainProcWrite  ("stgs.pomp1duration = %s\n" % stgs.pomp1duration)
+        stgs_file.write("stgs.pomp2duration = %s\n" % stgs.pomp2duration)
+        mainProcWrite  ("stgs.pomp2duration = %s\n" % stgs.pomp2duration)
+        stgs_file.write("stgs.lightStart = %s\n" % stgs.lightStart)
+        mainProcWrite  ("stgs.lightStart = %s\n" % stgs.lightStart)
+        stgs_file.write("stgs.lightDuration = %s\n" % stgs.lightDuration)
+        mainProcWrite  ("stgs.lightDuration = %s\n" % stgs.lightDuration)
+        stgs_file.close()
+        # call (["dir >lll"],shell=True)
+        # os.spawnlp(os.P_NOWAIT,"screen top &")
+        # call (["pkill -9 -f 'python /root/GrowBox/growRoom.py'"],shell=True)
+        self.title.set_text("Saved..")
 
     def onlight(self):
         try:
