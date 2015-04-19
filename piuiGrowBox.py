@@ -23,21 +23,24 @@ class DemoPiUi(object):
         self.ui = PiUi(img_dir=os.path.join(current_dir, 'imgs'))
 
     def page_static(self):
-        self.page = self.ui.new_ui_page(title="Static Content", prev_text="Back",
+        self.page = self.ui.new_ui_page(title="Logs and Statistics", prev_text="Back",
             onprevclick=self.main_menu)
-        self.page.add_textbox("Add a mobile UI to your Raspberry Pi project", "h1")
-        self.page.add_element("hr")
-        self.page.add_textbox("You can use any static HTML element " + 
-            "in your UI and <b>regular</b> <i>HTML</i> <u>formatting</u>.", "p")
-        self.page.add_element("hr")
-        self.page.add_textbox("Your python code can update page contents at any time.", "p")
+        mainProcWrite("logs\n")
+        self.page.add_textbox("Logs:", "h1")
+        # self.page.add_element("hr")
+        # self.page.add_textbox("You can use any static HTML element " + 
+        #     "in your UI and <b>regular</b> <i>HTML</i> <u>formatting</u>.", "p")
+        # self.page.add_element("hr")
+        # self.page.add_textbox("Your python code can update page contents at any time.", "p")
         # update = self.page.add_textbox("Like this...", "h2")
-        logBox = self.page.add_textbox("2015-04-17 10:39:51 Temp=12.5*C Hum=55.7% Moist=False\n time"
-            + "<br /> newline", "pre")
-        time.sleep(2)
-        # for a in range(1, 5):
+        # logBox = self.page.add_textbox("2015-04-17 10:39:51 Temp=12.5*C Hum=55.7% Moist=False\n time"
+        #    + "<br /> newline", "pre")
+        logBox = self.page.add_textbox("Retreiving data", "pre")
+        # sleep(2)
+        for a in range(1, 4):
             # update.set_text(str(a))
-            # time.sleep(1)
+            logBox.set_text("Retreiving data"+('.'*a))
+            sleep(1)
         lines = []
         with open(os.path.join(current_dir,'logs'), 'r') as content_file:
         # with open(os.path.join(current_dir,'stgs2.py'), 'r') as content_file:
@@ -51,9 +54,9 @@ class DemoPiUi(object):
         # plus = self.page.add_button("Up Button &uarr;", self.onupclick)
         minus = self.page.add_button("Commit &darr;", self.ondownclick)
 
-    def page_input(self):
+    def page_lights(self):
         self.page = self.ui.new_ui_page(title="Lights setup", prev_text="Back", onprevclick=self.main_menu)
-        self.title = self.page.add_textbox("pPi time: "+strftime("%d-%X"), "h1")
+        self.title = self.page.add_textbox("rPi time: "+strftime("%d-%X"), "h1")
         self.labelStart = self.page.add_textbox("Start [hour]: "+str(stgs.lightStart), "h2")
         self.txtStart = self.page.add_input("number", "new Start hour [0..23]")
         self.labelDuration = self.page.add_textbox("Duration [hour]: "+str(stgs.lightDuration), "h2")
@@ -92,10 +95,10 @@ class DemoPiUi(object):
         self.page = self.ui.new_ui_page(title="Grow Box setup")
         self.list = self.page.add_list()
         self.list.add_item("Logs", chevron=True, onclick=self.page_static)
-        self.list.add_item("Lights", chevron=True, onclick=self.page_input)
+        self.list.add_item("Lights", chevron=True, onclick=self.page_lights)
         self.list.add_item("Treshold", chevron=True, onclick=self.page_treshold)
-        self.list.add_item("Pumps", chevron=True, onclick=self.page_input)
-        self.list.add_item("Commit", chevron=False, onclick=self.page_buttons)
+        self.list.add_item("Pumps", chevron=True, onclick=self.page_lights)
+        self.list.add_item("Commit", chevron=True, onclick=self.page_buttons)
 #        self.list.add_item("Images", chevron=True, onclick=self.page_images)
 #        self.list.add_item("Toggles", chevron=True, onclick=self.page_toggles)
 #        self.list.add_item("Console!", chevron=True, onclick=self.page_console)
@@ -111,7 +114,7 @@ class DemoPiUi(object):
         print "Up"
 
     def ondownclick(self):
-        stgs_file = open("stgs2.py", "w")
+        stgs_file = open("stgs.py", "w")
         stgs_file.write("class Class(): pass\n"
           + "stgs=Class()\n\n")
         stgs_file.write("stgs.temperature = %s\n" % stgs.temperature)
@@ -127,9 +130,6 @@ class DemoPiUi(object):
         stgs_file.write("stgs.lightDuration = %s\n" % stgs.lightDuration)
         mainProcWrite  ("stgs.lightDuration = %s\n" % stgs.lightDuration)
         stgs_file.close()
-        # call (["dir >lll"],shell=True)
-        # os.spawnlp(os.P_NOWAIT,"screen top &")
-        # call (["pkill -9 -f 'python /root/GrowBox/growRoom.py'"],shell=True)
         self.title.set_text("Saved..")
 
     def onlight(self):
