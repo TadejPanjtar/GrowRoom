@@ -1,5 +1,6 @@
 import functools
 import os
+import sys
 import random
 from time import strftime,sleep
 from piui import PiUi
@@ -26,7 +27,7 @@ class DemoPiUi(object):
         self.page = self.ui.new_ui_page(title="Logs and Statistics", prev_text="Back",
             onprevclick=self.main_menu)
         mainProcWrite("logs\n")
-        self.page.add_textbox("Logs:", "h1")
+        self.title = self.page.add_textbox("Logs:", "h1")
         # self.page.add_element("hr")
         # self.page.add_textbox("You can use any static HTML element " + 
         #     "in your UI and <b>regular</b> <i>HTML</i> <u>formatting</u>.", "p")
@@ -46,6 +47,7 @@ class DemoPiUi(object):
         # with open(os.path.join(current_dir,'stgs2.py'), 'r') as content_file:
               lines.append(content_file.read())
         message = '\n'.join(lines)
+	self.title.set_text("")
         logBox.set_text(message)
 
     def page_buttons(self):
@@ -114,7 +116,7 @@ class DemoPiUi(object):
         print "Up"
 
     def ondownclick(self):
-        stgs_file = open("stgs.py", "w")
+        stgs_file = open(os.path.join(current_dir, "stgs.py"), "w")
         stgs_file.write("class Class(): pass\n"
           + "stgs=Class()\n\n")
         stgs_file.write("stgs.temperature = %s\n" % stgs.temperature)
@@ -130,7 +132,8 @@ class DemoPiUi(object):
         stgs_file.write("stgs.lightDuration = %s\n" % stgs.lightDuration)
         mainProcWrite  ("stgs.lightDuration = %s\n" % stgs.lightDuration)
         stgs_file.close()
-        self.title.set_text("Saved..")
+        self.title.set_text("Saved.. reload page!")
+	sys.exit(1)
 
     def onlight(self):
         try:

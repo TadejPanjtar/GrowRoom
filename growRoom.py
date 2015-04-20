@@ -16,7 +16,7 @@ humidity=0
 moisture=0
 LOGGING=True
 logs=[]
-LOGS_SIZE=55
+LOGS_SIZE=23
 heating=False
 
 def log(msg):
@@ -160,18 +160,30 @@ def tenMinutesCheck():
 
 t=None; h=None; moisture=False;
 
+GPIO.setup(LED1, LedOFF)
+handle_light()
+#while not(temperature):
+#  temperature=ths.get_temperature(THS)
+#  sleep(0.5)
+#while not(humidity):
+#  humidity=ths.get_humidity(THS);
+#  sleep(0.5)
+
 while True: # Main loop begin
   if blinkTick % NumSensors == 0:
     t=ths.get_temperature(THS);
     if t: # handle empty variable
       temperature=t;
+    sleep(0.5)
   if blinkTick % NumSensors == 1:
     h=ths.get_humidity(THS); 
     if h:
       humidity=h;
+    sleep(0.5)
   if blinkTick % NumSensors == 2:
     moisture = (GPIO.input(MOIST) == GPIO.LOW)
-    sleep(1)
+    sleep(0.5)
+    sleep(0.5)
   if blinkTick % 2== 0: #every second tick conditionally turns leds on to blink
     if temperature<stgs.temperature:
       GPIO.setup(LED2, LedON)
@@ -179,7 +191,7 @@ while True: # Main loop begin
       GPIO.setup(LED3, LedON)
     if not(moisture):
       GPIO.setup(LED4, LedON)
-    log('Temp={0:0.1f}*C Hum={1:0.1f}% Moist={2}' .format(temperature, humidity, moisture))
+    if blinkTick % 3600==0:log('Temp={0:0.1f}*C Hum={1:0.1f}% Moist={2}' .format(temperature, humidity, moisture))
   else: #turn leds off
     GPIO.setup(LED2, LedOFF)
     GPIO.setup(LED3, LedOFF)
@@ -193,7 +205,6 @@ while True: # Main loop begin
         logs_file = open(current_dir+"/logs", "w")
         logs_file.write('\n'.join(logs) + '\n')
         logs_file.close()
-        print("writing to file")
       else:
         try:
           log(cmd.strip()+"="+str(gv(cmd.strip())))

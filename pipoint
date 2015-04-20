@@ -14,3 +14,5 @@
 ### END INIT INFO
 # start the access point
 hostapd -B /etc/hostapd/hostapd.conf
+sleep 3 && python /root/./GrowRoom/growRoom.py &
+while [ 1 ]; do python /root/./GrowRoom/piuiGrowBox.py; done &

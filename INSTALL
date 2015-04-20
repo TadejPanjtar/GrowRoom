@@ -4,6 +4,6 @@ AS ROOT (sudo su -)
 apt-get update; apt-get install python-pip python-dev python-smbus -y
 
 from http://www.airspayce.com/mikem/bcm2835/ :
-wget www.airspayce.com/mikem/bcm2835/bcm2835-1.42.tar.gz
+wget www.airspayce.com/mikem/bcm2835/bcm2835-1.44.tar.gz
 
 pip install am2302_rpi
