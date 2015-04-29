@@ -191,7 +191,7 @@ while True: # Main loop begin
       GPIO.setup(LED3, LedON)
     if not(moisture):
       GPIO.setup(LED4, LedON)
-    if blinkTick % 3600==0:log('Temp={0:0.1f}*C Hum={1:0.1f}% Moist={2}' .format(temperature, humidity, moisture))
+    if blinkTick % 3600==30:log('Temp={0:0.1f}*C Hum={1:0.1f}% Moist={2}' .format(temperature, humidity, moisture))
   else: #turn leds off
     GPIO.setup(LED2, LedOFF)
     GPIO.setup(LED3, LedOFF)
